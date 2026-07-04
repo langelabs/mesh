@@ -1,4 +1,4 @@
-# image: ghcr.io/langelabs/stack/mesh:latest
+# image: ghcr.io/langelabs/mesh:latest
 
 FROM python:3.13-slim@sha256:dc1546eefcbe8caaa1f004f16ab76b204b5e1dbd58ff81b899f21cd40541232f
 
@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN python -m pip install --no-cache-dir uv
 
-COPY pyproject.toml uv.lock README.md ./
+COPY pyproject.toml uv.lock README.md LICENSE ./
 COPY src ./src
 
 RUN uv sync --locked --no-dev \
