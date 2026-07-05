@@ -11,11 +11,12 @@ from mesh_service import state
 from mesh_service.config import Settings, get_settings
 from mesh_service.router.worker import MeshWorker
 from mesh_service.utils.messages import dump_mesh_message
+from starlette.datastructures import Headers
 
 from .__router import workers_router
 
 
-def _is_authorized(headers: object, settings: Settings) -> bool:
+def _is_authorized(headers: Headers, settings: Settings) -> bool:
     """Return whether a worker websocket request is authorized.
 
     :param headers: Websocket request headers.
@@ -24,8 +25,7 @@ def _is_authorized(headers: object, settings: Settings) -> bool:
     """
     if settings.worker_secret is None:
         return True
-    authorization = getattr(headers, "get", lambda _: None)("authorization")
-    return authorization == f"Bearer {settings.worker_secret}"
+    return headers.get("Authorization", None) == f"Bearer {settings.worker_secret}"
 
 
 @workers_router.websocket("/entrypoint")

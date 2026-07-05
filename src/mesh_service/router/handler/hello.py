@@ -35,12 +35,12 @@ class HelloHandler(BaseHandler):
             raise RuntimeError("No relay worker registration in hello message.")
         if not is_valid_relay_name(message.data.name):
             raise ValueError("Relay name must be DNS-label-safe.")
-        if message.data.request_timeout_seconds <= 0:
+        if message.data.timeout <= 0:
             raise ValueError("Relay request timeout must be greater than 0.")
 
         # set up the worker on the server
         worker.name = message.data.name
-        worker.timeout = message.data.request_timeout_seconds
+        worker.timeout = message.data.timeout
 
         # set up the worker remote
         settings = get_settings()

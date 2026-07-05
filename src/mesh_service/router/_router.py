@@ -65,7 +65,6 @@ class MeshRouter:
         :param message: Parsed mesh message sent by the connected compute worker.
         :param worker: The compute worker from which the message was received.
         :param websocket: Compute worker websocket used for immediate control replies.
-        :param settings: Runtime API settings used to build relay worker config.
         :raises RuntimeError: If a response has no waiting listener.
         :raises NotImplementedError: If the message status is unsupported.
         """
@@ -103,7 +102,7 @@ class MeshRouter:
         worker = self._get_worker(name)
         if worker.timeout is None:
             raise RuntimeError("No relay worker request timeout registered")
-        message = MeshMessage(status="request", data=request)
+        message = MeshMessage(status="request", data=request, type="relay")
         result_queue: Queue[MeshMessage] = Queue()
         self.result_map[message.id] = result_queue
 
