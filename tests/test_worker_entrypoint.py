@@ -8,6 +8,7 @@ from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 from lange.contracts.mesh import MeshMessage
 from lange.contracts.relay import MeshRelayRequest, MeshRelayResponse
+from starlette.testclient import WebSocketTestSession
 
 from mesh_service import state
 from mesh_service.endpoints.workers import workers_router
@@ -22,6 +23,74 @@ def mesh_worker_environment(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     state.MESH_ROUTER = MeshRouter()
     yield
     state.MESH_ROUTER = MeshRouter()
+
+
+def _register_ready_worker(
+    websocket: WebSocketTestSession,
+    *,
+    name: str = "demo",
+    timeout: float = 5.0,
+) -> None:
+    """Register a websocket worker and wait until ready is processed.
+
+    :param websocket: Worker websocket test session.
+    :param name: Relay worker name to register.
+    :param timeout: Relay request timeout to register.
+    """
+    registration = {"name": name, "timeout": timeout}
+    websocket.send_json(
+        MeshMessage(status="hello", type="manage", data=registration).model_dump(mode="json")
+    )
+    websocket.receive_json()
+    websocket.send_json(
+        MeshMessage(status="ready", type="manage", data=None).model_dump(mode="json")
+    )
+    websocket.send_json(
+        MeshMessage(status="ping", type="manage", data=None).model_dump(mode="json")
+    )
+    websocket.receive_json()
+
+
+def test_worker_entrypoint_stores_direct_peer_ip_address() -> None:
+    """Assert registered workers store the websocket peer address."""
+    app = FastAPI()
+    app.include_router(workers_router, prefix="/v1")
+
+    with TestClient(app) as client:
+        with client.websocket_connect(
+            "/v1/workers/entrypoint",
+            headers={"X-Forwarded-For": "203.0.113.10"},
+        ) as websocket:
+            _register_ready_worker(websocket)
+
+            worker = state.MESH_ROUTER.workers["demo"][0]
+            assert worker.ip_address is not None
+            assert worker.ip_address != "203.0.113.10"
+
+
+def test_get_workers_returns_registered_worker_ip_address() -> None:
+    """Assert the workers view includes the stored websocket peer address."""
+    app = FastAPI()
+    app.include_router(workers_router, prefix="/v1")
+
+    with TestClient(app) as client:
+        with client.websocket_connect("/v1/workers/entrypoint") as websocket:
+            _register_ready_worker(websocket)
+            worker = state.MESH_ROUTER.workers["demo"][0]
+
+            response = client.get("/v1/workers")
+
+            assert response.status_code == 200
+            assert response.json() == {
+                "workers": [
+                    {
+                        "name": "demo",
+                        "ip_address": worker.ip_address,
+                        "timeout": 5.0,
+                        "status": "ready",
+                    }
+                ]
+            }
 
 
 def test_relay_request_sends_worker_json_object_frame() -> None:

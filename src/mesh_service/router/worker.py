@@ -10,9 +10,10 @@ class MeshWorker:
     def __init__(self) -> None:
         """Initialize the outbound message queue for one mesh worker."""
         self.queue: Queue[MeshMessage] = Queue()
+        self.ip_address: str|None = None
         self.is_ready = False
-        self.name: "str | None" = None
-        self.timeout: "float | None" = None
+        self.name: str | None = None
+        self.timeout: float | None = None
 
     async def listen(self) -> AsyncGenerator[MeshMessage, None]:
         """Yield queued mesh messages that should be sent to the worker.

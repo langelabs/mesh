@@ -5,13 +5,13 @@ from contextlib import suppress
 
 from lange.contracts.mesh import MeshMessage
 from pydantic import ValidationError
+from starlette.datastructures import Headers
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 
 from mesh_service import state
 from mesh_service.config import Settings, get_settings
 from mesh_service.router.worker import MeshWorker
 from mesh_service.utils.messages import dump_mesh_message
-from starlette.datastructures import Headers
 
 from .__router import workers_router
 
@@ -40,6 +40,7 @@ async def worker_entrypoint(websocket: WebSocket) -> None:
         return
 
     mesh_worker = MeshWorker()
+    mesh_worker.ip_address = websocket.client.host if websocket.client is not None else None
     is_registered = False
 
     try:
