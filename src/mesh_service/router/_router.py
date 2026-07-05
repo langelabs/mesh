@@ -6,7 +6,7 @@ import uuid
 from starlette.websockets import WebSocket
 
 from lange.contracts.mesh import MeshMessage
-from lange.contracts.mesh.relay import MeshRelayRequest, MeshRelayResponse
+from lange.contracts.relay import MeshRelayRequest, MeshRelayResponse
 
 from .handler import HelloHandler, PingHandler, ReadyHandler, ResponseHandler
 from .worker import MeshWorker
@@ -24,17 +24,17 @@ class MeshRouter:
         self.result_map: dict[uuid.UUID, Queue[MeshMessage]] = dict()
 
     def register_worker(self, name: str, worker: MeshWorker) -> None:
-        """Register one connected compute worker in a keyed pool.
+        """Register one connected compute worker in a named pool.
 
-        :param name: Compute worker pool name, defaults to ``default``.
+        :param name: Compute worker pool name.
         :param worker: Connected compute worker session to add to the pool.
         """
         self.workers.setdefault(name, []).append(worker)
 
     def unregister_worker(self, name: str, worker: MeshWorker) -> None:
-        """Unregister one connected compute worker from a keyed pool.
+        """Unregister one connected compute worker from a named pool.
 
-        :param name: Compute worker pool name, currently ``default``.
+        :param name: Compute worker pool name.
         :param worker: Connected compute worker session to remove from the pool.
         """
         workers = self.workers[name]
@@ -43,15 +43,15 @@ class MeshRouter:
             del self.workers[name]
 
     def _get_worker(self, name: str) -> MeshWorker:
-        """Return one compute worker selected from the requested keyed pool.
+        """Return one compute worker selected from the requested named pool.
 
-        :param name: Compute worker pool key.
+        :param name: Compute worker pool name.
         :returns: Randomly selected compute worker connection.
-        :raises RuntimeError: If no workers are registered for the key.
+        :raises RuntimeError: If no workers are registered for the name.
         """
         workers = self.workers.get(name, [])
         if len(workers) == 0:
-            raise RuntimeError("No workers registered for key {}".format(name))
+            raise RuntimeError("No workers registered for name {}".format(name))
         return random.choice(workers)
 
     async def handle_message_from_worker(
@@ -91,12 +91,12 @@ class MeshRouter:
             name: str,
             request: MeshRelayRequest,
     ) -> MeshRelayResponse:
-        """Send one REST request to a keyed compute worker and await its response.
+        """Send one REST request to a named compute worker and await its response.
 
-        :param key: Compute worker pool key.
+        :param name: Compute worker pool name.
         :param request: REST request payload to forward.
         :returns: REST response payload published by the compute worker.
-        :raises RuntimeError: If no compute workers serve the key or the response
+        :raises RuntimeError: If no compute workers serve the name or the response
             has an unexpected payload type.
         :raises TimeoutError: If no response arrives before the worker-owned timeout.
         """

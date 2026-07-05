@@ -9,7 +9,7 @@ def build_upstream_url(
     """Build the internal API relay URL for one incoming mesh request.
 
     :param relay_base_url: Internal API relay endpoint base URL.
-    :param name: Relay key extracted from the public hostname.
+    :param name: Relay name extracted from the public hostname.
     :param path: Incoming request path without a leading slash.
     :param query_string: Raw incoming query string.
     :returns: Absolute internal relay URL.

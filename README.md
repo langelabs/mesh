@@ -10,8 +10,8 @@ FastAPI standalone relay service for public mesh hosts.
 Workers connect to `/v1/workers/entrypoint`. If `MESH_WORKER_SECRET` is set,
 workers must send `Authorization: Bearer <secret>`.
 
-Requests to `{key}.mesh.lange-labs.com/{path}` are forwarded directly to the
-connected in-process relay worker registered for `{key}`.
+Requests to `{name}.mesh.lange-labs.com/{path}` are forwarded directly to the
+connected in-process relay worker registered for `{name}`.
 
 ## Requirements
 
@@ -73,8 +73,8 @@ Authorization: Bearer <secret>
 ```
 
 Relay requests are routed by host name. A request to
-`{key}.<MESH_BASE_DOMAIN>/<path>` is forwarded to the connected worker
-registered for `{key}`.
+`{name}.<MESH_BASE_DOMAIN>/<path>` is forwarded to the connected worker
+registered for `{name}`.
 
 ## Checks
 

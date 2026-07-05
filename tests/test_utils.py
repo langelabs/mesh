@@ -22,7 +22,7 @@ def test_extract_mesh_name_accepts_single_label_wildcard_host() -> None:
 
 
 def test_extract_mesh_name_rejects_root_domain() -> None:
-    """Assert the bare mesh domain is not a valid keyed relay host."""
+    """Assert the bare mesh domain is not a valid named relay host."""
     assert extract_mesh_name("mesh.lange-labs.com", "mesh.lange-labs.com") is None
 
 

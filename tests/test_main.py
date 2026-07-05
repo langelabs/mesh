@@ -7,7 +7,7 @@ from collections.abc import Iterator
 import pytest
 from fastapi.testclient import TestClient
 from lange.contracts.mesh import MeshMessage
-from lange.contracts.mesh.relay import MeshRelayRequest, MeshRelayResponse
+from lange.contracts.relay import MeshRelayRequest, MeshRelayResponse
 from starlette.websockets import WebSocketDisconnect
 
 from mesh_service import main as mesh_main
@@ -88,7 +88,7 @@ def test_old_root_entrypoint_is_not_mounted() -> None:
 
 def test_worker_entrypoint_allows_connection_without_secret() -> None:
     """Assert worker auth is disabled when no mesh worker secret is configured."""
-    registration = {"key": "demo", "requestTimeoutSeconds": 5.0}
+    registration = {"name": "demo", "requestTimeoutSeconds": 5.0}
     with TestClient(mesh_main.app) as client:
         with client.websocket_connect("/v1/workers/entrypoint") as websocket:
             websocket.send_json(
@@ -147,7 +147,7 @@ def test_worker_entrypoint_accepts_valid_bearer_auth(
     assert response["status"] == "ready"
 
 
-def test_keyed_get_routes_through_in_process_mesh_router() -> None:
+def test_named_get_routes_through_in_process_mesh_router() -> None:
     """Assert public relay GET requests are sent to the local mesh router."""
     router = _FakeRouter(
         response=MeshRelayResponse(
@@ -175,7 +175,7 @@ def test_keyed_get_routes_through_in_process_mesh_router() -> None:
     assert router.calls[0][1].body is None
 
 
-def test_keyed_post_routes_body_through_in_process_mesh_router() -> None:
+def test_named_post_routes_body_through_in_process_mesh_router() -> None:
     """Assert public relay POST requests preserve body bytes and content headers."""
     router = _FakeRouter(response=MeshRelayResponse(status=204))
     state.MESH_ROUTER = router
@@ -200,7 +200,7 @@ def test_keyed_post_routes_body_through_in_process_mesh_router() -> None:
 
 def test_no_registered_worker_returns_service_unavailable() -> None:
     """Assert missing relay workers produce a 503 response."""
-    state.MESH_ROUTER = _FakeRouter(error=RuntimeError("No workers registered for key demo"))
+    state.MESH_ROUTER = _FakeRouter(error=RuntimeError("No workers registered for name demo"))
 
     with TestClient(mesh_main.app) as client:
         response = client.get(

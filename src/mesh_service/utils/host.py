@@ -9,7 +9,7 @@ def resolve_mesh_host(request: Request) -> str:
     Resolve the effective public mesh host for one proxied request.
 
     :param request: Incoming public or reverse-proxied HTTP request.
-    :returns: Host value used for mesh key extraction.
+    :returns: Host value used for mesh name extraction.
     """
     host = request.headers.get("host", "")
     base_domain = get_settings().mesh_base_domain
