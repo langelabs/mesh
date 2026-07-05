@@ -3,11 +3,11 @@
 import base64
 from collections.abc import Mapping, Sequence
 
-from fastapi import HTTPException, Request, Response
-from lange.contracts.mesh import MeshRelayRequest, MeshRelayResponse
+from fastapi import HTTPException, Response
+from lange.contracts.mesh import  MeshRelayResponse
 from starlette import status
 
-from .headers import PROXY_CONTROLLED_HEADERS, sanitize_request_headers
+from .headers import PROXY_CONTROLLED_HEADERS
 
 
 def build_query_param_map(query_items: Sequence[tuple[str, str]]) -> dict[str, list[str]]:
@@ -36,23 +36,7 @@ def normalize_forwarded_path(path: str | None) -> str:
     return f"/{normalized_path.lstrip('/')}"
 
 
-async def build_relay_request(request: Request, path: str | None) -> MeshRelayRequest:
-    """Build one relay request payload from an incoming HTTP request.
 
-    :param request: Incoming public mesh HTTP request.
-    :param path: Route-captured path segment, or ``None`` for root requests.
-    :returns: Relay request payload for the connected worker.
-    """
-    body = await request.body()
-    return MeshRelayRequest(
-        method=request.method.upper(),
-        path=normalize_forwarded_path(path),
-        headers=sanitize_request_headers(request.headers),
-        body=base64.b64encode(body).decode("ascii") if body else None,
-        body_encoding="base64" if body else None,
-        query_params=build_query_param_map(list(request.query_params.multi_items())),
-        query_string=request.url.query or None,
-    )
 
 
 def _base64_decoded_size(value: str) -> int:

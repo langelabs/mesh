@@ -25,4 +25,4 @@ class PingHandler(BaseHandler):
         :returns: Ready response message.
         """
         del message, worker, result_map
-        return MeshMessage(status="ready", data=None)
+        return MeshMessage(status="ready", data=None, type="manage")

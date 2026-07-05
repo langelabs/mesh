@@ -3,12 +3,16 @@
 from fastapi import HTTPException, Request, Response
 from starlette import status
 
+from lange.contracts import MeshRelayRequest
 from mesh_service import state
 from mesh_service.config import get_settings
 from mesh_service.utils.host import resolve_mesh_host
 from mesh_service.utils.methods import HTTP_METHODS
+from mesh_service.utils.headers import sanitize_request_headers
 from mesh_service.utils.name import extract_mesh_name
-from mesh_service.utils.relay import build_http_response, build_relay_request
+from mesh_service.utils.relay import build_http_response, normalize_forwarded_path, build_query_param_map
+import base64
+
 
 from .__router import relay_router
 
@@ -32,7 +36,18 @@ async def relay_mesh_request(
     if name is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    relay_request = await build_relay_request(request, path)
+    # build the relay request
+    body = await request.body()
+    relay_request =  MeshRelayRequest(
+        method=request.method.upper(),
+        path=normalize_forwarded_path(path),
+        headers=sanitize_request_headers(request.headers),
+        body=base64.b64encode(body).decode("ascii") if body else None,
+        body_encoding="base64" if body else None,
+        query_params=build_query_param_map(list(request.query_params.multi_items())),
+        query_string=request.url.query or None,
+    )
+
     try:
         relay_response = await state.MESH_ROUTER.relay_rest(name, relay_request)
     except RuntimeError as error:

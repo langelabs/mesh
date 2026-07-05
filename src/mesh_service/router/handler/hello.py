@@ -53,4 +53,4 @@ class HelloHandler(BaseHandler):
             type="REST",
         )
 
-        return MeshMessage(status="hello", data=config)
+        return MeshMessage(status="hello",type="manage", data=config)

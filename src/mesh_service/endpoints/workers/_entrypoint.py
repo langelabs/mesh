@@ -10,6 +10,7 @@ from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 from mesh_service import state
 from mesh_service.config import Settings, get_settings
 from mesh_service.router.worker import MeshWorker
+from mesh_service.utils.messages import dump_mesh_message
 
 from .__router import workers_router
 
@@ -66,7 +67,7 @@ async def worker_entrypoint(websocket: WebSocket) -> None:
                     raise WebSocketDisconnect(code=1008) from error
 
                 if response is not None:
-                    await websocket.send_json(response.model_dump_json())
+                    await websocket.send_json(dump_mesh_message(response))
 
                 if message.status == "ready" and not is_registered:
                     if mesh_worker.name is None or mesh_worker.timeout is None:
@@ -82,7 +83,7 @@ async def worker_entrypoint(websocket: WebSocket) -> None:
         async def write_to_worker() -> None:
             """Write queued mesh messages to the worker websocket."""
             async for message in mesh_worker.listen():
-                await websocket.send_json(message.model_dump_json())
+                await websocket.send_json(dump_mesh_message(message))
 
         await websocket.accept()
 
