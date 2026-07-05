@@ -10,7 +10,7 @@ dependencies = [
     "pydantic>=2.12.0",
     "httpx>=0.28.1",
     "uvicorn>=0.44.0",
-    "lange-python>=0.5.0",
+    "lange-python>=0.7.1",
 ]
 
 [build-system]

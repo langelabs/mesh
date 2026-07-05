@@ -189,7 +189,7 @@ wheels = [
 
 [[package]]
 name = "lange-python"
-version = "0.5.0"
+version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
@@ -197,11 +197,13 @@ dependencies = [
     { name = "httpx" },
     { name = "idna" },
     { name = "pydantic" },
+    { name = "python-dotenv" },
+    { name = "ruff" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/81/c9/10ed3716c5607dd915af2675801fae5d868fdfa298abc655353cabd1ca82/lange_python-0.5.0.tar.gz", hash = "sha256:fb2653af27d5207eebe69c272f04c23be9d7013d1adbaac1c7453a9ea56d8b5f", size = 25628, upload-time = "2026-06-30T10:57:34.432Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/66/d8/fbf896cf998ff0f53b8aa44f721552eb3046b84e36f194130efaa1789de6/lange_python-0.7.1.tar.gz", hash = "sha256:1e4d691fb7d61ac6f51bde0c27fb9e75d3e13e0731ce415b6a8776d89333b76d", size = 18963, upload-time = "2026-07-05T17:44:40.088Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5c/b7/8dd963230e146d0d72d02d80048aefb97595dbd06268c2e0cb3c9d293e1d/lange_python-0.5.0-py3-none-any.whl", hash = "sha256:e784feaa30e17bc6f8f8e82effe78ac42ecbbe00ab3039bedd5ea2658f4e10e3", size = 39443, upload-time = "2026-06-30T10:57:33.316Z" },
+    { url = "https://files.pythonhosted.org/packages/de/82/36af474578f7475638fdf454b448a069b892ca1883260ad174de3ceeb411/lange_python-0.7.1-py3-none-any.whl", hash = "sha256:37ee508d5dc800e461ee38cd424850ae85420eadc14d53e603abccdf5ebf6d98", size = 30583, upload-time = "2026-07-05T17:44:38.826Z" },
 ]
 
 [[package]]
@@ -228,7 +230,7 @@ dev = [
 requires-dist = [
     { name = "fastapi", specifier = ">=0.135.3" },
     { name = "httpx", specifier = ">=0.28.1" },
-    { name = "lange-python", specifier = ">=0.5.0" },
+    { name = "lange-python", specifier = ">=0.7.1" },
     { name = "pydantic", specifier = ">=2.12.0" },
     { name = "uvicorn", specifier = ">=0.44.0" },
 ]
@@ -367,6 +369,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/51/a849f96e117386044471c8ec2bd6cfebacda285da9525c9106aeb28da671/pytest_cov-7.1.0.tar.gz", hash = "sha256:30674f2b5f6351aa09702a9c8c364f6a01c27aae0c1366ae8016160d1efc56b2", size = 55592, upload-time = "2026-03-21T20:11:16.284Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9d/7a/d968e294073affff457b041c2be9868a40c1c71f4a35fcc1e45e5493067b/pytest_cov-7.1.0-py3-none-any.whl", hash = "sha256:a0461110b7865f9a271aa1b51e516c9a95de9d696734a2f71e3e78f46e1d4678", size = 22876, upload-time = "2026-03-21T20:11:14.438Z" },
+]
+
+[[package]]
+name = "python-dotenv"
+version = "1.2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3", size = 50135, upload-time = "2026-03-01T16:00:26.196Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0b/d7/1959b9648791274998a9c3526f6d0ec8fd2233e4d4acce81bbae76b44b2a/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a", size = 22101, upload-time = "2026-03-01T16:00:25.09Z" },
 ]
 
 [[package]]
