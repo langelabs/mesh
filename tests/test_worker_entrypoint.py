@@ -41,17 +41,17 @@ def test_relay_request_sends_worker_json_object_frame() -> None:
             status_code=relay_response.status,
         )
 
-    registration = {"name": "demo", "requestTimeoutSeconds": 5.0}
+    registration = {"name": "demo", "timeout": 5.0}
     response_holder: dict[str, object] = {}
 
     with TestClient(app) as client:
         with client.websocket_connect("/v1/workers/entrypoint") as websocket:
             websocket.send_json(
-                MeshMessage(status="hello", data=registration).model_dump(mode="json")
+                MeshMessage(status="hello", type="manage", data=registration).model_dump(mode="json")
             )
             websocket.receive_json()
             websocket.send_json(
-                MeshMessage(status="ready", data=None).model_dump(mode="json")
+                MeshMessage(status="ready", type="manage", data=None).model_dump(mode="json")
             )
 
             def request_relay() -> None:
@@ -72,6 +72,7 @@ def test_relay_request_sends_worker_json_object_frame() -> None:
                 MeshMessage(
                     id=request_message.id,
                     status="response",
+                    type="relay",
                     data=MeshRelayResponse(status=200, body="ok"),
                 ).model_dump(mode="json")
             )

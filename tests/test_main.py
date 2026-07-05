@@ -88,18 +88,18 @@ def test_old_root_entrypoint_is_not_mounted() -> None:
 
 def test_worker_entrypoint_allows_connection_without_secret() -> None:
     """Assert worker auth is disabled when no mesh worker secret is configured."""
-    registration = {"name": "demo", "requestTimeoutSeconds": 5.0}
+    registration = {"name": "demo", "timeout": 5.0}
     with TestClient(mesh_main.app) as client:
         with client.websocket_connect("/v1/workers/entrypoint") as websocket:
             websocket.send_json(
-                MeshMessage(status="hello", data=registration).model_dump(mode="json")
+                MeshMessage(status="hello", type="manage", data=registration).model_dump(mode="json")
             )
             hello_response = websocket.receive_json()
             websocket.send_json(
-                MeshMessage(status="ready", data=None).model_dump(mode="json")
+                MeshMessage(status="ready", type="manage", data=None).model_dump(mode="json")
             )
             websocket.send_json(
-                MeshMessage(status="ping", data=None).model_dump(mode="json")
+                MeshMessage(status="ping", type="manage", data=None).model_dump(mode="json")
             )
             ready_response = websocket.receive_json()
 
@@ -141,7 +141,9 @@ def test_worker_entrypoint_accepts_valid_bearer_auth(
             "/v1/workers/entrypoint",
             headers={"Authorization": "Bearer secret-token"},
         ) as websocket:
-            websocket.send_json(MeshMessage(status="ping", data=None).model_dump(mode="json"))
+            websocket.send_json(
+                MeshMessage(status="ping", type="manage", data=None).model_dump(mode="json")
+            )
             response = websocket.receive_json()
 
     assert response["status"] == "ready"
