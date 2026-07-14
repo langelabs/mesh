@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - stable
   pull_request:
     branches:
       - main
@@ -62,7 +63,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable')
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -75,17 +76,17 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=ref,event=branch
             type=ref,event=pr
             type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=raw,value=stable,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/stable' }}
 
       - name: Build and publish image
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable') }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           cache-from: type=gha

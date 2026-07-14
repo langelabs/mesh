@@ -1,14 +1,18 @@
 """Tests for the standalone mesh worker websocket entrypoint."""
 
+import asyncio
 import threading
 from collections.abc import Iterator
+from typing import Any
 
+import httpx
 import pytest
 from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 from lange.contracts.mesh import MeshMessage
 from lange.contracts.relay import MeshRelayRequest, MeshRelayResponse
 from starlette.testclient import WebSocketTestSession
+from starlette.websockets import WebSocket
 
 from mesh_service import state
 from mesh_service.endpoints.workers import workers_router
@@ -151,3 +155,69 @@ def test_relay_request_sends_worker_json_object_frame() -> None:
     response = response_holder["response"]
     assert response.status_code == 200
     assert response.content == b"ok"
+
+
+def test_worker_entrypoint_serializes_control_and_relay_frames(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Assert one writer task sends both control and relay websocket frames.
+
+    :param monkeypatch: Pytest patch helper used to observe websocket sends.
+    """
+    app = FastAPI()
+    app.include_router(workers_router, prefix="/v1")
+    response_holder: dict[str, httpx.Response] = {}
+    writer_tasks: set[asyncio.Task[Any]] = set()
+    original_send_json = WebSocket.send_json
+
+    async def record_send_task(
+        websocket: WebSocket,
+        data: Any,
+        mode: str = "text",
+    ) -> None:
+        """Record the current sender task before forwarding one JSON frame.
+
+        :param websocket: Server websocket sending the frame.
+        :param data: JSON-compatible frame payload.
+        :param mode: Starlette websocket frame mode.
+        """
+        writer_task = asyncio.current_task()
+        assert writer_task is not None
+        writer_tasks.add(writer_task)
+        await original_send_json(websocket, data, mode=mode)
+
+    monkeypatch.setattr(WebSocket, "send_json", record_send_task)
+
+    @app.get("/status")
+    async def relay_status() -> Response:
+        """Relay one request while the registered worker is connected."""
+        relay_response = await state.MESH_ROUTER.relay_rest(
+            "demo",
+            MeshRelayRequest(method="GET", path="/status"),
+        )
+        return Response(status_code=relay_response.status)
+
+    with TestClient(app) as client:
+        with client.websocket_connect("/v1/workers/entrypoint") as websocket:
+            _register_ready_worker(websocket)
+
+            def request_relay() -> None:
+                """Send one relay request from a parallel HTTP client thread."""
+                response_holder["response"] = client.get("/status")
+
+            relay_thread = threading.Thread(target=request_relay)
+            relay_thread.start()
+            request_message = MeshMessage.model_validate(websocket.receive_json())
+            websocket.send_json(
+                MeshMessage(
+                    id=request_message.id,
+                    status="response",
+                    type="relay",
+                    data=MeshRelayResponse(status=204),
+                ).model_dump(mode="json")
+            )
+            relay_thread.join(timeout=2)
+
+    assert not relay_thread.is_alive()
+    assert response_holder["response"].status_code == 204
+    assert len(writer_tasks) == 1

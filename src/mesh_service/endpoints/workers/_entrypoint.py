@@ -60,7 +60,6 @@ async def worker_entrypoint(websocket: WebSocket) -> None:
                     response = await state.MESH_ROUTER.handle_message_from_worker(
                         worker=mesh_worker,
                         message=message,
-                        websocket=websocket,
                     )
                 except (RuntimeError, ValueError) as error:
                     if websocket.application_state == WebSocketState.CONNECTED:
@@ -68,7 +67,7 @@ async def worker_entrypoint(websocket: WebSocket) -> None:
                     raise WebSocketDisconnect(code=1008) from error
 
                 if response is not None:
-                    await websocket.send_json(dump_mesh_message(response))
+                    await mesh_worker.queue.put(response)
 
                 if message.status == "ready" and not is_registered:
                     if mesh_worker.name is None or mesh_worker.timeout is None:
