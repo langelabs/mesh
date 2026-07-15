@@ -3,14 +3,11 @@ from logging import getLogger
 import random
 import uuid
 
-from starlette.websockets import WebSocket
-
 from lange.contracts.mesh import MeshMessage
 from lange.contracts.relay import MeshRelayRequest, MeshRelayResponse
 
 from .handler import HelloHandler, PingHandler, ReadyHandler, ResponseHandler
 from .worker import MeshWorker
-from mesh_service.utils.messages import dump_mesh_message
 
 logger = getLogger("com.lange-labs.mesh")
 
@@ -58,13 +55,12 @@ class MeshRouter:
             self,
             message: MeshMessage,
             worker: MeshWorker,
-            websocket: WebSocket,
-    ) -> None:
+    ) -> MeshMessage | None:
         """Handle one control or response message received from a compute worker.
 
         :param message: Parsed mesh message sent by the connected compute worker.
         :param worker: The compute worker from which the message was received.
-        :param websocket: Compute worker websocket used for immediate control replies.
+        :returns: Control response to enqueue for the worker, if one is required.
         :raises RuntimeError: If a response has no waiting listener.
         :raises NotImplementedError: If the message status is unsupported.
         """
@@ -81,9 +77,7 @@ class MeshRouter:
         else:
             raise NotImplementedError("Message status not implemented Status: {}".format(message.status))
 
-        # return the response if one is generated
-        if response is not None:
-            await websocket.send_json(dump_mesh_message(response))
+        return response
 
     async def relay_rest(
             self,
