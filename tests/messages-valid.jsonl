@@ -1,0 +1,9 @@
+{"msg":"hello","meta":{"version":1,"node_from":"peer","node_to":"local","hops":["peer"]},"payload":{"greeting":{"node_id":"peer","name":"Peer","version":1}}}
+{"msg":"-hello","meta":{"version":7,"node_from":"local","node_to":"peer","hops":["local"]},"payload":{"greeting":{"node_id":"local","name":"Local","version":7},"error":null}}
+{"msg":"friends","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"max_distance":3}}
+{"msg":"-friends","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"friends":[{"id":"near","name":"Peer","version":1,"distance":2,"via":"peer","detours":["backup"]}]}}
+{"msg":"can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{}}
+{"msg":"-can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"can":[{"node":"peer","id":"echo","name":"Echo","description":"Echo a value","input":[{"name":"value","type":"string","description":"Input value"}],"output":[]}]}}
+{"msg":"do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"id":"echo","input":[9007199254740993,-9223372036854775808,18446744073709551615,1.25,"text",true,["a",2],{"ready":false},[],{}]}}
+{"msg":"-do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"outputs":[["a",2]]}}
+{"msg":"-do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"outputs":[],"error":{"code":404,"message":"Unknown capability"}}}

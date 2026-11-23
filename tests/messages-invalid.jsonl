@@ -1,0 +1,22 @@
+{
+null
+{"msg":"can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{}} {}
+{"msg":"ping","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{}}
+{"msg":"can","payload":{}}
+{"msg":"can","meta":{"version":9223372036854775808,"node_from":"peer","node_to":"local","hops":[]},"payload":{}}
+{"msg":"can","meta":{"version":1.5,"node_from":"peer","node_to":"local","hops":[]},"payload":{}}
+{"msg":"can","meta":{"version":1,"node_from":null,"node_to":"local","hops":[]},"payload":{}}
+{"msg":"can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[null]},"payload":{}}
+{"msg":"can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":null},"payload":{}}
+{"msg":"can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":null}
+{"msg":"hello","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"greeting":{"node_id":"peer","name":"Peer"}}}
+{"msg":"friends","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"max_distance":"3"}}
+{"msg":"-friends","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"friends":[null]}}
+{"msg":"-friends","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"friends":[{"id":"near","name":"Peer","version":1,"distance":2,"via":"peer","detours":false}]}}
+{"msg":"-can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"can":null}}
+{"msg":"-can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"can":[{"node":"peer","id":"echo","name":"Echo","description":"","input":[null],"output":[]}]}}
+{"msg":"do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"id":"echo","input":[[["nested"]]]}}
+{"msg":"do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"id":"echo","input":[{"nested":[1]}]}}
+{"msg":"do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"id":"echo","input":[null]}}
+{"msg":"do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"id":"echo","input":[1e999]}}
+{"msg":"-do","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{"outputs":[],"error":{"code":500}}}

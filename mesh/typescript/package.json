@@ -1,0 +1,25 @@
+{
+  "name": "lange-mesh",
+  "version": "0.1.0",
+  "description": "TypeScript implementation of the Lange Mesh messages and router.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "oxlint --deny-warnings src tests",
+    "test": "npm run build && node --test"
+  },
+  "devDependencies": {
+    "oxlint": "1.94.0",
+    "typescript": "6.0.3"
+  }
+}

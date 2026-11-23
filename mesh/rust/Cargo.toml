@@ -1,0 +1,13 @@
+[package]
+name = "lange-mesh"
+version = "0.1.0"
+edition = "2024"
+description = "Rust implementation of the Lange Mesh messages and router."
+
+[dependencies]
+indexmap = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+pollster = "0.4"

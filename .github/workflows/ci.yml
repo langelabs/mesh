@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: mesh/python
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v8.1.0
+        with:
+          python-version: "3.11"
+          enable-cache: true
+          cache-dependency-glob: mesh/python/uv.lock
+      - name: Lint
+        run: uv run --locked ruff check .
+      - name: Test
+        run: uv run --locked pytest
+
+  typescript:
+    name: TypeScript
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: mesh/typescript
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: mesh/typescript/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+
+  go:
+    name: Go
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: mesh/go
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: mesh/go/go.mod
+          cache: false
+      - name: Lint
+        run: go vet ./...
+      - name: Test
+        run: go test -race ./...
+
+  rust:
+    name: Rust
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: mesh/rust
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Rust and Clippy
+        run: rustup toolchain install stable --profile minimal --component clippy
+      - name: Lint
+        run: cargo +stable clippy --locked --all-targets -- -D warnings
+      - name: Test
+        run: cargo +stable test --locked
+
+  cpp:
+    name: C++
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: mesh/cpp
+    steps:
+      - uses: actions/checkout@v6
+      - name: Lint
+        run: |
+          cmake -S . -B build -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror"
+          cmake --build build --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
