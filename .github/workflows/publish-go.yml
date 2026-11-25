@@ -1,0 +1,4 @@
+name: publish-go.yml
+on:
+
+jobs:

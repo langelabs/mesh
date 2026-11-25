@@ -19,7 +19,12 @@ class MeshRouter(MeshToolGroup, HandlerProtocol):
     """Track a mesh node's local capabilities, peers, and connections."""
 
     async def hande_message(self, msg: MeshMsg) -> MeshMsg | MeshMsg.Payload:
+        """Dispatch a message to the appropriate Mesh handler.
 
+        :param msg: Incoming request or acknowledgement.
+        :returns: A reply envelope for a request or the payload of an acknowledgement.
+        :raises NotImplementedError: If the message type has no handler.
+        """
         # hello
         if isinstance(msg, MeshMsgHello):
             return await self._handle_hello_request(msg)
@@ -33,13 +38,13 @@ class MeshRouter(MeshToolGroup, HandlerProtocol):
             return await self._handle_can_ack(msg)
 
         # do
-        if isinstance(msg, MeshMsgDo):
-            await self._handle_do_request(msg)
+        elif isinstance(msg, MeshMsgDo):
+            return await self._handle_do_request(msg)
         elif isinstance(msg, MeshMsgDoAck):
-            await self._handle_do_ack(msg)
+            return await self._handle_do_ack(msg)
 
-        #friends
-        if isinstance(msg, MeshMsgFriends):
+        # friends
+        elif isinstance(msg, MeshMsgFriends):
             return await self._handle_friends_request(msg)
         elif isinstance(msg, MeshMsgFriendsAck):
             return await self._handle_friends_ack(msg)
@@ -60,6 +65,13 @@ class MeshRouter(MeshToolGroup, HandlerProtocol):
 
         # actual connections
         self._connections: dict[NodeId, BaseConnection] = {}
+
+    def get_greeting(self) -> Greeting:
+        """Return this node's current identity and protocol version.
+
+        :returns: The greeting advertised to peers.
+        """
+        return Greeting(node_id=self._id, name=self._name, version=self._version)
 
     def __get_msg_meta(self, to: NodeId) -> MeshMsgMeta:
         """Build message metadata for an outbound reply.
@@ -186,11 +198,7 @@ class MeshRouter(MeshToolGroup, HandlerProtocol):
         self.__merge_greeting(msg.payload.greeting)
         return MeshMsgHelloAck(
             meta=self.__get_msg_meta(msg.meta.node_from),
-            payload=MeshMsgHelloAck.Payload(
-                greeting=Greeting(
-                    node_id=self._id, name=self._name, version=self._version
-                )
-            ),
+            payload=MeshMsgHelloAck.Payload(greeting=self.get_greeting()),
         )
 
     async def _handle_can_ack(self, msg: MeshMsgCanAck) -> MeshMsgCanAck.Payload:

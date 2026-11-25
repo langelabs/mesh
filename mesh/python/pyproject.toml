@@ -11,6 +11,9 @@ dependencies = [
     "websockets>=15,<18",
 ]
 
+[project.optional-dependencies]
+fastapi = ["fastapi>=0.115,<1"]
+
 [tool.poetry]
 packages = [{ include = "mesh" }]
 
@@ -19,7 +22,12 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
-dev = ["pytest>=8.4.2,<9.0.0", "ruff>=0.17.6,<0.18"]
+dev = [
+    "mesh-python[fastapi]",
+    "httpx2>=2,<3",
+    "pytest>=8.4.2,<9.0.0",
+    "ruff>=0.17.6,<0.18",
+]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F"]
