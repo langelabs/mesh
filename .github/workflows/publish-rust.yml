@@ -1,0 +1,4 @@
+name: publish-rust.yml
+on:
+
+jobs:

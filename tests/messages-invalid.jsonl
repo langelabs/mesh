@@ -1,5 +1,4 @@
-{
-null
+
 {"msg":"can","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{}} {}
 {"msg":"ping","meta":{"version":1,"node_from":"peer","node_to":"local","hops":[]},"payload":{}}
 {"msg":"can","payload":{}}

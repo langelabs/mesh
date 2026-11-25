@@ -10,6 +10,7 @@ import pytest
 from mesh.messages import (
     MeshMsgCan,
     MeshMsgDo,
+    MeshMsgDoAck,
     MeshMsgFriends,
     MeshMsgFriendsAck,
     MeshMsgHello,
@@ -178,9 +179,12 @@ def test_do_request_awaits_registered_tool(
             id=f"{invoke.__module__}.{invoke.__qualname__}", input=["argument"]
         ),
     )
-    reply = asyncio.run(router._handle_do_request(request))
+    reply = asyncio.run(router.hande_message(request))
+    assert isinstance(reply, MeshMsgDoAck)
     assert reply.meta.node_to == peer._id
-    assert asyncio.run(peer._handle_do_ack(reply)).outputs == outputs
+    payload = asyncio.run(peer.hande_message(reply))
+    assert isinstance(payload, MeshMsgDoAck.Payload)
+    assert payload.outputs == outputs
     assert reply.payload.error is None
 
 

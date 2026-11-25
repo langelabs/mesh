@@ -18,6 +18,25 @@ limit during WebSocket message assembly.
 with vendor and product IDs. `WebSocketConnection(url).discover()` returns the
 configured outbound endpoint without probing it.
 
+## FastAPI
+
+Install `mesh-python[fastapi]` and include the router on your existing FastAPI
+app. Pass the `MeshRouter` that owns the node's identity and registered tools.
+
+```python
+from mesh.connections.fastapi import create_mesh_router
+from mesh.router import MeshRouter
+
+node = MeshRouter()
+app.include_router(create_mesh_router(node))
+```
+
+`GET /.well-known/mesh` returns the node's `Greeting` as JSON. WebSocket clients
+connect to `/mesh` and exchange one Mesh JSON envelope per text message, up to
+1 MiB. The host ASGI server can enforce the same limit during frame assembly.
+Peers can invoke tools registered on the node. Apply the host app's access
+controls when exposing the WebSocket to untrusted clients.
+
 ## WebSocket LAN discovery
 
 Pass the local node's `Greeting` to discover Mesh peers on active IPv4 subnets.
